@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import './App.css';
-import ImageCard from './components/imageCard';
+import ImageCard from './components/ImageCard';
 import ImageSearch from './components/ImageSearch';
 
 function App() {
@@ -8,15 +7,35 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [term, setTerm] = useState("");
 
+  // useEffect(() => {
+  //   fetch(`https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${term}&image_type=photo`)
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       setImages(data.hits);
+  //       setLoading(false);
+  //     })
+  //     .catch(err => console.log(err));
+  // }, [term]);
+
+  //async-await:  
+  const getAPI = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}=${term}`)
+      if (response.status !== 200) {
+        throw new Error("The API id down, try again later!")
+      }
+      const data = await response.json()
+      setImages(data.hits)
+      setLoading(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
-    fetch(`https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${term}&image_type=photo&pretty=true`)
-      .then(res => res.json())
-      .then(data => {
-        setImages(data.hits);
-        setLoading(false);
-      })
-      .catch(err => console.log(err));
-  }, [term]);
+    getAPI()
+  }, [term])
 
   return (
     <div className='container mx-auto'>
